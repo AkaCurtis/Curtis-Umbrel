@@ -1,11 +1,11 @@
-import {$} from 'execa'
+import { $ } from "execa";
 
 // Get a directory size in bytes
 async function getDirectorySize(directoryPath: string) {
-	const du = await $`du --summarize --bytes ${directoryPath}`
-	const totalSize = parseInt(du.stdout.split('\t')[0], 10)
+  const du = await $`du --summarize --bytes ${directoryPath}`;
+  const totalSize = parseInt(du.stdout.split("\t")[0], 10);
 
-	return totalSize
+  return totalSize;
 }
 
-export default getDirectorySize
+export default getDirectorySize;

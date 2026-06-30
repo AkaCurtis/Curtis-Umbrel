@@ -1,30 +1,30 @@
-import {Buffer} from 'node:buffer'
+import { Buffer } from "node:buffer";
 
-import {expect, afterAll, describe, test} from 'vitest'
-import pRetry from 'p-retry'
+import { expect, afterAll, describe, test } from "vitest";
+import pRetry from "p-retry";
 
-import {createTestVm} from '../test-utilities/create-test-umbreld.js'
+import { createTestVm } from "../test-utilities/create-test-umbreld.js";
 
-describe('Custom pre-start hooks', () => {
-	let umbreld: Awaited<ReturnType<typeof createTestVm>>
+describe("Custom pre-start hooks", () => {
+  let umbreld: Awaited<ReturnType<typeof createTestVm>>;
 
-	const umbrelDataDirectory = '/home/umbrel/umbrel'
-	const hooksDirectory = `${umbrelDataDirectory}/custom-hooks`
-	const hookPath = `${hooksDirectory}/pre-start`
-	const runCountPath = `${hooksDirectory}/pre-start-run-count`
-	const processStatePath = `${hooksDirectory}/pre-start-umbrel-process-state`
-	const bootMarkerPath = '/run/umbrel-custom-pre-start-vm-test'
-	const setupMarker = 'pre-start-hook-setup-complete'
-	const systemPassword = 'moneyprintergobrrr'
+  const umbrelDataDirectory = "/home/umbrel/umbrel";
+  const hooksDirectory = `${umbrelDataDirectory}/custom-hooks`;
+  const hookPath = `${hooksDirectory}/pre-start`;
+  const runCountPath = `${hooksDirectory}/pre-start-run-count`;
+  const processStatePath = `${hooksDirectory}/pre-start-umbrel-process-state`;
+  const bootMarkerPath = "/run/umbrel-custom-pre-start-vm-test";
+  const setupMarker = "pre-start-hook-setup-complete";
+  const systemPassword = "moneyprintergobrrr";
 
-	afterAll(async () => await umbreld?.cleanup())
+  afterAll(async () => await umbreld?.cleanup());
 
-	test('runs a persisted pre-start hook on the next boot before umbreld starts', async () => {
-		umbreld = await createTestVm({device: 'umbrel-home'})
-		await umbreld.vm.powerOn()
-		await umbreld.registerAndLogin()
+  test("runs a persisted pre-start hook on the next boot before umbreld starts", async () => {
+    umbreld = await createTestVm({ device: "umbrel-home" });
+    await umbreld.vm.powerOn();
+    await umbreld.registerAndLogin();
 
-		const hookScript = `#!/bin/sh
+    const hookScript = `#!/bin/sh
 set -eu
 
 hooks_directory="/home/umbrel/umbrel/custom-hooks"
@@ -45,10 +45,10 @@ else
 fi
 
 printf 'ran\\n' > "$boot_marker_path"
-`
-		const encodedHookScript = Buffer.from(hookScript).toString('base64')
+`;
+    const encodedHookScript = Buffer.from(hookScript).toString("base64");
 
-		const setupOutput = await umbreld.vm.ssh(`
+    const setupOutput = await umbreld.vm.ssh(`
 {
 printf '%s\\n' '${systemPassword}' | sudo -S -p '' sh -c "set -eu
 mkdir -p '${hooksDirectory}'
@@ -59,26 +59,56 @@ test -x '${hookPath}'
 echo '${setupMarker}'
 "
 } 2>&1
-`)
+`);
 
-		expect(setupOutput).toContain(setupMarker)
-		expect((await umbreld.vm.ssh(`test -x '${hookPath}' && echo executable || echo missing`)).trim()).toBe('executable')
-		expect((await umbreld.vm.ssh(`test -e '${runCountPath}' && echo exists || echo missing`)).trim()).toBe('missing')
+    expect(setupOutput).toContain(setupMarker);
+    expect(
+      (
+        await umbreld.vm.ssh(
+          `test -x '${hookPath}' && echo executable || echo missing`,
+        )
+      ).trim(),
+    ).toBe("executable");
+    expect(
+      (
+        await umbreld.vm.ssh(
+          `test -e '${runCountPath}' && echo exists || echo missing`,
+        )
+      ).trim(),
+    ).toBe("missing");
 
-		await umbreld.vm.powerOff()
-		await umbreld.vm.powerOn()
-		await umbreld.login()
+    await umbreld.vm.powerOff();
+    await umbreld.vm.powerOn();
+    await umbreld.login();
 
-		await pRetry(
-			async () => {
-				expect((await umbreld.vm.ssh(`test -x '${hookPath}' && echo executable || echo missing`)).trim()).toBe(
-					'executable',
-				)
-				expect((await umbreld.vm.ssh(`cat '${runCountPath}' 2>/dev/null || true`)).trim()).toBe('1')
-				expect((await umbreld.vm.ssh(`cat '${processStatePath}' 2>/dev/null || true`)).trim()).toBe('not-running')
-				expect((await umbreld.vm.ssh(`cat '${bootMarkerPath}' 2>/dev/null || true`)).trim()).toBe('ran')
-			},
-			{retries: 50, minTimeout: 100, maxTimeout: 100},
-		)
-	})
-})
+    await pRetry(
+      async () => {
+        expect(
+          (
+            await umbreld.vm.ssh(
+              `test -x '${hookPath}' && echo executable || echo missing`,
+            )
+          ).trim(),
+        ).toBe("executable");
+        expect(
+          (
+            await umbreld.vm.ssh(`cat '${runCountPath}' 2>/dev/null || true`)
+          ).trim(),
+        ).toBe("1");
+        expect(
+          (
+            await umbreld.vm.ssh(
+              `cat '${processStatePath}' 2>/dev/null || true`,
+            )
+          ).trim(),
+        ).toBe("not-running");
+        expect(
+          (
+            await umbreld.vm.ssh(`cat '${bootMarkerPath}' 2>/dev/null || true`)
+          ).trim(),
+        ).toBe("ran");
+      },
+      { retries: 50, minTimeout: 100, maxTimeout: 100 },
+    );
+  });
+});

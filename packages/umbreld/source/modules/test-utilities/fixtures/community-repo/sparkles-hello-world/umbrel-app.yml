@@ -4,7 +4,7 @@ name: Hello World
 tagline: Replace this tagline with your app's tagline
 icon: https://svgur.com/i/mvA.svg
 category: Development
-version: '1.0.0'
+version: "1.0.0"
 port: 4000
 description: >-
   Add your app's description here.
@@ -25,9 +25,9 @@ gallery:
 releaseNotes: >-
   Add what's new in the latest version of your app here.
 dependencies: []
-path: ''
-defaultUsername: ''
-defaultPassword: ''
+path: ""
+defaultUsername: ""
+defaultPassword: ""
 backupIgnore:
   - data
   - logs

@@ -1,6 +1,6 @@
 {
-	"extends": "@tsconfig/node22/tsconfig.json",
-	"compilerOptions": {
-		"resolveJsonModule": true
-	}
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "resolveJsonModule": true
+  }
 }
