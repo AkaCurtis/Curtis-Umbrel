@@ -1,0 +1,38 @@
+﻿#!/bin/bash
+# Stub systemctl for containers ΓÇö manages services directly since systemd is not PID 1.
+# Only services that umbreld actually manages at runtime are handled here.
+# All other systemctl calls are silently ignored.
+
+ACTION="$1"
+SERVICE="$2"
+
+case "${ACTION} ${SERVICE}" in
+  "start smbd")
+    pgrep -x smbd >/dev/null || smbd --no-process-group &
+    ;;
+  "stop smbd")
+    pkill -x smbd 2>/dev/null || true
+    ;;
+  "start wsdd2")
+    pgrep -x wsdd2 >/dev/null || wsdd2 &
+    ;;
+  "stop wsdd2")
+    pkill -x wsdd2 2>/dev/null || true
+    ;;
+  "restart avahi-daemon")
+    pkill avahi-daemon 2>/dev/null || true
+    avahi-daemon --no-drop-root -D
+    ;;
+  "restart NetworkManager")
+    # Not applicable in a container ΓÇö network is managed by the host.
+    true
+    ;;
+  "restart umbrel-dns-sync")
+    # OS-specific unit ΓÇö not present in a container.
+    true
+    ;;
+  *)
+    # Silently succeed for all other calls (enables, disables, etc.)
+    true
+    ;;
+esac
