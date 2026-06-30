@@ -1,0 +1,15 @@
+services:
+  umbrel:
+    image: ghcr.io/akacurtis/curtis-umbrel:latest
+    container_name: umbrel
+    pid: host
+    network_mode: host
+    volumes:
+      # Persist Umbrel data
+      - ./umbrel-data:/home/umbrel/umbrel
+      # Allow Umbrel to manage host Docker containers (required)
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=Etc/UTC
+    restart: always
+    stop_grace_period: 1m

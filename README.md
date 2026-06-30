@@ -1,32 +1,95 @@
-[![umbrelOS](https://github.com/user-attachments/assets/cabf8af7-51ce-45df-ad3a-a664cc91c610)](https://umbrel.com/umbrelos)
+![umbrelOS](https://github.com/user-attachments/assets/cabf8af7-51ce-45df-ad3a-a664cc91c610)
 
-<p align="center">
-  <h1 align="center">umbrelOS</h1>
-  <p align="center">
-    A beautiful home server OS for self-hosting
-    <br />
-    <a href="https://umbrel.com"><strong>umbrel.com »</strong></a>
-    <br />
-    <br />
-       Get an <a href="https://umbrel.com/umbrel-pro">Umbrel Pro</a> or <a href="https://umbrel.com/umbrel-home">Umbrel Home</a> for the full experience, or install umbrelOS on a <a href="https://github.com/getumbrel/umbrel/wiki/Install-umbrelOS-on-a-Raspberry-Pi-5">Raspberry Pi 5</a> or <a href="https://github.com/getumbrel/umbrel/wiki/Install-umbrelOS-on-x86-systems">any x86 system</a> for free.
-    <br />
-    <br />
-    <a href="https://x.com/umbrel">
-      <img src="https://img.shields.io/twitter/follow/umbrel?style=social" />
-    </a>
-    <a href="https://discord.gg/efNtFzqtdx">
-      <img src="https://img.shields.io/discord/936694604231766046?logo=discord&logoColor=5351FB&label=Discord&labelColor=white&color=5351FB&cacheSeconds=60">
-    </a>
-    <a href="https://reddit.com/r/getumbrel">
-      <img src="https://img.shields.io/reddit/subreddit-subscribers/getumbrel?style=social">
-    </a>
-    <a href="https://community.umbrel.com">
-      <img src="https://img.shields.io/discourse/users?server=https%3A%2F%2Fcommunity.umbrel.com&style=flat&label=Community%20Forum&color=5351FB&cacheSeconds=60">
-    </a>
-  </p>
-</p>
+# umbrelOS (Unofficial Docker Image)
 
-<br />
+> ⚠️ **Important Notice: This is an unofficial Docker image!**
+> This project is a containerized build of **umbrelOS**, designed to run directly in Docker instead of as a host operating system.
+> **It is not endorsed or supported by the Umbrel official team. Use at your own risk.**
+>
+> Official Umbrel website: <https://umbrel.com>
+> Source repository: <https://github.com/AkaCurtis/Curtis-Umbrel>
+
+---
+
+# ⭐ umbrelOS
+## A beautiful self-hosted home server OS
+
+Umbrel's vision is to let everyone enjoy the convenience of the cloud while maintaining full control over their data. With Umbrel, you can easily deploy apps and services on a small home server, creating your own private cloud.
+
+---
+
+# 🚀 How to run
+
+No bare-metal installation or VM required — just Docker.
+
+---
+
+## 1. Pull the image
+
+```bash
+docker pull ghcr.io/akacurtis/curtis-umbrel:latest
+```
+
+---
+
+## 2. Run with Docker Compose (recommended)
+
+> ❗ **Important:**
+> umbrelOS manages other Docker containers, so you must mount the host Docker socket and use `pid: host`.
+
+Save this as `docker-compose.yml` (or clone this repo — it's already included):
+
+```yaml
+services:
+  umbrel:
+    image: ghcr.io/akacurtis/curtis-umbrel:latest
+    container_name: umbrel
+    pid: host
+    network_mode: host
+    volumes:
+      - ./umbrel-data:/home/umbrel/umbrel
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=Etc/UTC
+    restart: always
+    stop_grace_period: 1m
+```
+
+Then start it:
+
+```bash
+docker compose up -d
+```
+
+---
+
+## 3. Access umbrelOS
+
+Wait a minute or two for initialization, then open:
+
+```
+http://<YOUR_HOST_IP>
+```
+
+---
+
+# ⚙️ Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `TZ` | `Etc/UTC` | Container timezone, e.g. `America/New_York` |
+
+---
+
+# 📜 License
+
+umbrelOS is licensed under the **PolyForm Noncommercial 1.0.0** license.
+
+- ✅ Free for personal and non-commercial use, modification, and redistribution.
+- ❌ Commercial use is prohibited.
+- This Docker image is subject to the same license.
+
+---
 
 <p align="center">
 At Umbrel, we believe that everyone should be able to enjoy the convenience and benefits of the cloud, without giving up ownership and control of their data.
