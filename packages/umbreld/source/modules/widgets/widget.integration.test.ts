@@ -2,43 +2,66 @@
 // and have since changed the API. We'll refactor these later.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import {expect, beforeAll, afterAll, test} from 'vitest'
+import { expect, beforeAll, afterAll, test } from "vitest";
 
-import createTestUmbreld from '../test-utilities/create-test-umbreld.js'
-import runGitServer from '../test-utilities/run-git-server.js'
+import createTestUmbreld from "../test-utilities/create-test-umbreld.js";
+import runGitServer from "../test-utilities/run-git-server.js";
 
-let umbreld: Awaited<ReturnType<typeof createTestUmbreld>>
-let communityAppStoreGitServer: Awaited<ReturnType<typeof runGitServer>>
+let umbreld: Awaited<ReturnType<typeof createTestUmbreld>>;
+let communityAppStoreGitServer: Awaited<ReturnType<typeof runGitServer>>;
 
 beforeAll(async () => {
-	;[umbreld, communityAppStoreGitServer] = await Promise.all([createTestUmbreld(), runGitServer()])
-})
+  [umbreld, communityAppStoreGitServer] = await Promise.all([
+    createTestUmbreld(),
+    runGitServer(),
+  ]);
+});
 
 afterAll(async () => {
-	await Promise.all([communityAppStoreGitServer.close(), umbreld.cleanup()])
-})
+  await Promise.all([communityAppStoreGitServer.close(), umbreld.cleanup()]);
+});
 
 // The following tests are stateful and must be run in order
 
-test.sequential('enabled() throws invalid error when no user is registered', async () => {
-	await expect(umbreld.client.widget.enabled.query()).rejects.toThrow('Invalid token')
-})
+test.sequential(
+  "enabled() throws invalid error when no user is registered",
+  async () => {
+    await expect(umbreld.client.widget.enabled.query()).rejects.toThrow(
+      "Invalid token",
+    );
+  },
+);
 
-test.sequential('enable() throws invalid error when no user is registered', async () => {
-	await expect(umbreld.client.widget.enable.mutate({widgetId: 'umbrel:storage'})).rejects.toThrow('Invalid token')
-})
+test.sequential(
+  "enable() throws invalid error when no user is registered",
+  async () => {
+    await expect(
+      umbreld.client.widget.enable.mutate({ widgetId: "umbrel:storage" }),
+    ).rejects.toThrow("Invalid token");
+  },
+);
 
-test.sequential('disable() throws invalid error when no user is registered', async () => {
-	await expect(umbreld.client.widget.disable.mutate({widgetId: 'umbrel:storage'})).rejects.toThrow('Invalid token')
-})
+test.sequential(
+  "disable() throws invalid error when no user is registered",
+  async () => {
+    await expect(
+      umbreld.client.widget.disable.mutate({ widgetId: "umbrel:storage" }),
+    ).rejects.toThrow("Invalid token");
+  },
+);
 
-test.sequential('data() throws invalid error when no user is registered', async () => {
-	await expect(umbreld.client.widget.data.query({widgetId: 'umbrel:storage'})).rejects.toThrow('Invalid token')
-})
+test.sequential(
+  "data() throws invalid error when no user is registered",
+  async () => {
+    await expect(
+      umbreld.client.widget.data.query({ widgetId: "umbrel:storage" }),
+    ).rejects.toThrow("Invalid token");
+  },
+);
 
-test.sequential('login', async () => {
-	await expect(umbreld.registerAndLogin()).resolves.toBe(true)
-})
+test.sequential("login", async () => {
+  await expect(umbreld.registerAndLogin()).resolves.toBe(true);
+});
 
 // test.sequential('listAll() returns available widgets', async () => {
 // 	await expect(umbreld.client.widget.listAll.query()).resolves.toStrictEqual([
@@ -68,45 +91,71 @@ test.sequential('login', async () => {
 // 	])
 // })
 
-test.sequential('enabled() returns default widgets', async () => {
-	await expect(umbreld.client.widget.enabled.query()).resolves.toStrictEqual([
-		'umbrel:files-favorites',
-		'umbrel:storage',
-		'umbrel:system-stats',
-	])
-})
+test.sequential("enabled() returns default widgets", async () => {
+  await expect(umbreld.client.widget.enabled.query()).resolves.toStrictEqual([
+    "umbrel:files-favorites",
+    "umbrel:storage",
+    "umbrel:system-stats",
+  ]);
+});
 
-test.sequential('disable() can disable default widgets', async () => {
-	await expect(umbreld.client.widget.disable.mutate({widgetId: 'umbrel:files-favorites'})).resolves.toStrictEqual(true)
-	await expect(umbreld.client.widget.disable.mutate({widgetId: 'umbrel:storage'})).resolves.toStrictEqual(true)
-	await expect(umbreld.client.widget.disable.mutate({widgetId: 'umbrel:system-stats'})).resolves.toStrictEqual(true)
-})
+test.sequential("disable() can disable default widgets", async () => {
+  await expect(
+    umbreld.client.widget.disable.mutate({
+      widgetId: "umbrel:files-favorites",
+    }),
+  ).resolves.toStrictEqual(true);
+  await expect(
+    umbreld.client.widget.disable.mutate({ widgetId: "umbrel:storage" }),
+  ).resolves.toStrictEqual(true);
+  await expect(
+    umbreld.client.widget.disable.mutate({ widgetId: "umbrel:system-stats" }),
+  ).resolves.toStrictEqual(true);
+});
 
-test.sequential('enabled() returns no widgets when none are enabled', async () => {
-	await expect(umbreld.client.widget.enabled.query()).resolves.toStrictEqual([])
-})
+test.sequential(
+  "enabled() returns no widgets when none are enabled",
+  async () => {
+    await expect(umbreld.client.widget.enabled.query()).resolves.toStrictEqual(
+      [],
+    );
+  },
+);
 
-test.sequential('enable() enables a widget', async () => {
-	await expect(umbreld.client.widget.enable.mutate({widgetId: 'umbrel:storage'})).resolves.toStrictEqual(true)
-})
+test.sequential("enable() enables a widget", async () => {
+  await expect(
+    umbreld.client.widget.enable.mutate({ widgetId: "umbrel:storage" }),
+  ).resolves.toStrictEqual(true);
+});
 
-test.sequential('enabled() returns enabled widgets', async () => {
-	await expect(umbreld.client.widget.enabled.query()).resolves.toStrictEqual(['umbrel:storage'])
-})
+test.sequential("enabled() returns enabled widgets", async () => {
+  await expect(umbreld.client.widget.enabled.query()).resolves.toStrictEqual([
+    "umbrel:storage",
+  ]);
+});
 
-test.sequential('data() returns live widget data', async () => {
-	await expect(umbreld.client.widget.data.query({widgetId: 'umbrel:storage'})).resolves.toMatchObject({
-		title: 'Storage',
-		link: '?dialog=live-usage&tab=storage',
-		refresh: 30000,
-		type: 'text-with-progress',
-	})
-})
+test.sequential("data() returns live widget data", async () => {
+  await expect(
+    umbreld.client.widget.data.query({ widgetId: "umbrel:storage" }),
+  ).resolves.toMatchObject({
+    title: "Storage",
+    link: "?dialog=live-usage&tab=storage",
+    refresh: 30000,
+    type: "text-with-progress",
+  });
+});
 
-test.sequential('disable() disables a widget', async () => {
-	await expect(umbreld.client.widget.disable.mutate({widgetId: 'umbrel:storage'})).resolves.toStrictEqual(true)
-})
+test.sequential("disable() disables a widget", async () => {
+  await expect(
+    umbreld.client.widget.disable.mutate({ widgetId: "umbrel:storage" }),
+  ).resolves.toStrictEqual(true);
+});
 
-test.sequential('enabled() returns no widgets when they are all disabled', async () => {
-	await expect(umbreld.client.widget.enabled.query()).resolves.toStrictEqual([])
-})
+test.sequential(
+  "enabled() returns no widgets when they are all disabled",
+  async () => {
+    await expect(umbreld.client.widget.enabled.query()).resolves.toStrictEqual(
+      [],
+    );
+  },
+);

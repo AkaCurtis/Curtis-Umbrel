@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
   app_proxy:
@@ -8,5 +8,5 @@ services:
 
   server:
     image: getumbrel/community-app-store-hello-world:latest
-    user: '1000:1000'
+    user: "1000:1000"
     init: true
