@@ -79,7 +79,7 @@ ARG KOPIA_SHA256_arm64
 
 # Pin apt to a snapshot date for reproducibility (same as the full OS build).
 COPY packages/os/build-steps/initialize.sh /build-steps/initialize.sh
-RUN /build-steps/initialize.sh "${APT_SNAPSHOT_DATE}"
+RUN chmod +x /build-steps/initialize.sh && /build-steps/initialize.sh "${APT_SNAPSHOT_DATE}"
 RUN rm -rf /build-steps
 
 # Essential system utilities
@@ -157,7 +157,7 @@ WORKDIR /
 
 # Copy entrypoint
 COPY packages/os/container/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh /usr/local/bin/systemctl
 
 # Persist umbreld data across container restarts
 VOLUME /home/umbrel/umbrel
