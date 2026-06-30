@@ -55,6 +55,7 @@ ARG APT_SNAPSHOT_DATE
 ARG TARGETARCH
 
 COPY packages/os/build-steps /build-steps
+RUN find /build-steps -name '*.sh' -exec sed -i 's/\r$//' {} + && chmod +x /build-steps/*.sh
 
 RUN /build-steps/initialize.sh "${APT_SNAPSHOT_DATE}"
 
@@ -89,6 +90,7 @@ FROM debian:${DEBIAN_VERSION}-${DEBIAN_IMAGE_SNAPSHOT_DATE} AS umbrelos-base-pi
 ARG APT_SNAPSHOT_DATE
 
 COPY packages/os/build-steps /build-steps
+RUN find /build-steps -name '*.sh' -exec sed -i 's/\r$//' {} + && chmod +x /build-steps/*.sh
 
 RUN /build-steps/initialize.sh "${APT_SNAPSHOT_DATE}"
 
