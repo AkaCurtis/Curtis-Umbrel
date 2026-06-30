@@ -30,6 +30,9 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase owner
+        run: echo "OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v6
         with:
@@ -37,6 +40,9 @@ jobs:
           file: Dockerfile.container
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/curtis-umbrel:latest
+          tags: ghcr.io/${{ env.OWNER }}/curtis-umbrel:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+        env:
+          # repository_owner may contain uppercase letters; GHCR requires lowercase
+          DOCKER_METADATA_PR_HEAD_SHA: ${{ github.sha }}
