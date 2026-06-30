@@ -155,9 +155,9 @@ RUN rm -rf node_modules || true
 RUN npm clean-install --omit dev && npm link
 WORKDIR /
 
-# Copy entrypoint
+# Copy entrypoint (strip any CRLF line endings that cause exec format error on Linux)
 COPY packages/os/container/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh /usr/local/bin/systemctl
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh /usr/local/bin/systemctl
 
 # Persist umbreld data across container restarts
 VOLUME /home/umbrel/umbrel
