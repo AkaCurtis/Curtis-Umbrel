@@ -100,7 +100,7 @@ jobs:
       - name: Expose GitHub Actions runtime for Docker cache
         uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3
       - name: Fix script permissions
-        run: find packages/os -name '*.sh' -exec chmod +x {} +
+        run: find packages/os -type f \( -name '*.sh' -o ! -name '*.*' \) -exec grep -lI '^#!' {} + | xargs chmod +x
       - name: Build OS image
         working-directory: packages/os
         run: npm run build:amd64:rugix
